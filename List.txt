@@ -1,0 +1,266 @@
+#define  _CRT_SECURE_NO_WARNINGS	
+#include<iostream>
+#include<string>
+using namespace std;
+
+template<class T>
+struct ListNode
+{
+	T _data;
+	ListNode<T>* _prev;
+	ListNode<T>* _next;	
+
+	ListNode(T x)
+	{
+		_data = x;
+		_prev = NULL;
+		_next = NULL;
+	}
+};
+
+template<class T>
+class List
+{
+public:
+	List();
+	~List();
+	void PushBack(T x);
+	void PopBack();
+	void Print();
+	void Reverse();
+	void Unique();
+	void Sort();
+	ListNode<T>* Merge(List<T> & l);
+private:
+	ListNode<T>* _head;
+	ListNode<T>* _tail;
+};
+template <class T>
+List<T>::List()
+{
+	_head = NULL;
+	_tail = NULL;
+}
+template <class T>
+List<T>::~List()
+{
+	ListNode<T> *tmp = _head;
+	while (_head)
+	{	
+		
+			tmp = tmp->_next;
+			delete _head;
+			_head = tmp;
+
+		
+	}
+}
+template<class T>
+void List<T>::PushBack(T x)
+{
+	if (_head == NULL)
+	{
+		_head = new ListNode<T>(x);
+		_tail = _head;
+	}
+	else
+	{
+		ListNode<T>* tmp = new ListNode<T>(x);
+		tmp->_prev = _tail;
+		_tail->_next = tmp;
+		_tail = tmp;
+
+	}
+}
+template<class T>
+void List<T>::Print()
+{
+	ListNode<T>* tmp = _head;
+	while (tmp)
+	{
+		cout << tmp->_data << endl;
+		tmp = tmp->_next;
+	}
+}
+template<class T>
+void List<T>::PopBack()
+{
+	if (_tail)
+	{
+		ListNode<T>* tmp = _tail;
+		_tail = _tail->_prev;
+		_tail->_next = NULL;
+		delete tmp;
+	}
+}
+
+template<class T>
+void List<T>::Reverse()
+{
+	ListNode<T>* begin = _head;
+	ListNode<T>* end = _tail;
+	while (begin != end && begin->_prev != end)
+	   {
+			swap(begin->_data, end->_data);
+			begin = begin->_next;
+			end = end->_prev;
+		}
+}
+template<class T>
+void List<T>::Unique()
+{
+	if (_head != _tail)
+	{
+		ListNode<T>* first = _head;
+		ListNode<T>* second = _head->_next;
+		while (second)
+		{
+			if (first->_data == second->_data)
+			{
+				ListNode<T>* tmp = second->_next;
+				first->_next = tmp;
+				tmp->_prev = first;
+				delete second;
+				second = tmp;
+				
+			}
+			else
+			{
+			    first = first->_next;
+				second = second->_next;
+			}
+	
+		}
+	}
+}
+
+template<class T>
+void List<T>::Sort()
+{
+	ListNode<T>* tmp=_head;
+	ListNode<T>* end = _tail;
+	while (end!=_head)
+	{
+		while (tmp != end)
+		{
+			if (tmp->_data < tmp->_next->_data)
+			{
+				T data = tmp->_data;
+				tmp->_data = tmp->_next->_data;
+				tmp->_next->_data = data;
+			}
+			tmp = tmp->_next;
+		}
+		end = end->_prev;
+		tmp = _head;
+	}
+}
+
+template<class T>
+ListNode<T>* List<T>::Merge(List<T> & l) 
+{
+	ListNode<T>* cur1 = _head;
+	ListNode<T>* cur2 = l._head;
+	ListNode<T>* tmp = NULL;
+	ListNode<T>* NewHead = NULL;
+	if (cur1->_data > cur2->_data)
+	{
+		NewHead = cur2;
+		cur2 = cur2->_next;
+	
+		
+	}
+	else
+	{
+		NewHead = cur1;
+		cur1 = cur1->_next;
+		
+	}
+	tmp = NewHead;
+	while (cur1 && cur2)
+	{
+		if (cur1->_data >= cur2->_data)
+		{
+			cur2->_prev = tmp;
+			tmp->_next = cur2;
+			tmp = cur2;
+			cur2 = cur2->_next;
+			
+		}
+		else
+		{
+			cur1->_prev = tmp;
+			tmp->_next = cur1;
+			tmp = cur1;
+			cur1 = cur1->_next;
+		
+		}
+	}
+	if (cur1)
+	{
+		tmp->_next = cur2;
+		
+		return NewHead;
+	}
+	else
+	{
+		tmp->_next = cur1;
+		return NewHead;
+
+	}
+	
+}
+
+
+
+void test1()
+{ 
+	List<int> s1;
+	s1.PushBack(1);
+	s1.PushBack(3);
+	s1.PushBack(5);
+	s1.PushBack(7);
+	s1.PushBack(9);
+	List<int> s2;
+	s2.PushBack(2);
+	s2.PushBack(4);
+	s2.PushBack(6);
+	s2.PushBack(8);
+	s2.PushBack(10);
+	////s1.PushBack(1);
+	////s1.PushBack(1);
+	////s1.PushBack(1);
+	////s1.PushBack(1);
+	////s1.PushBack(5);
+	//s1.Print();
+	////List<string>s2;
+	////s2.PushBack("abc");
+	////s2.PushBack("def");
+	////s2.PushBack("sss");
+	////s2.Print();
+
+
+	////s1.Reverse();
+	////s1.Print();
+
+	////s1.Unique();
+	////s1.Print();
+
+	//cout << "___________________" << endl;
+	//s1.Sort();
+	//s1.Print();
+	ListNode<int>* tmp;
+	tmp = s1.Merge(s2);
+	
+	
+
+	
+
+}
+int main()
+{
+	test1();
+	system("pause");
+	return 0;
+}
+

@@ -1,0 +1,253 @@
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+#include<assert.h>
+enum  Type
+{
+	HEAD,
+	VALUE,
+	SUB,
+};
+
+struct GeneralListNode
+{
+	Type _type;
+	GeneralListNode* _next;
+	union
+	{
+		int _value;
+		GeneralListNode* _subLink;
+	};
+	GeneralListNode(Type type = HEAD, char value = 0)
+		:_type(type), _next(NULL), _value(value)
+	{}
+};
+
+class Generalied
+{
+public:
+	Generalied()
+		:_head(NULL)
+	{}
+	Generalied(const char* str)
+		:_head(NULL)
+	{
+		_head = _CreateList(str);
+	}
+	void Disp()
+	{
+		_Disp(_head);
+	}
+	Generalied(Generalied& g)
+	{
+		_head = _Copy(g._head);
+	}
+	Generalied& operator=(Generalied& g)
+	{
+		_head = _Copy(g._head);
+		return *this;
+	}
+	int Size()
+	{
+		return _Size(_head);
+	}
+	int Depth()
+	{
+		return _Depth(_head);
+	}
+	~Generalied()
+	{
+		_Destory(_head);
+	}
+protected:
+	void _Destory(GeneralListNode* head)
+	{
+		GeneralListNode* cur = head;
+		while (cur)
+		{
+			GeneralListNode* del = cur;
+			cur = cur->_next;
+			if (del->_type == SUB)
+			{
+				_Destory(del->_subLink);
+			}
+			delete del;
+			del = NULL;
+		}
+	}
+	
+	bool IsValue(const char str)
+	{
+		if (str >= '0' && str <= '9' || str >= 'a' && str <= 'z' || str >= 'A' && str <= 'Z')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	GeneralListNode* _CreateList(const char*& str)	//必须加引用
+	{
+		assert(*str == '(');
+		GeneralListNode* head = new GeneralListNode(HEAD);
+		GeneralListNode* cur = head;
+		++str;
+		while (str)
+		{
+			if (IsValue(*str))
+			{
+				GeneralListNode* tmp = new GeneralListNode(VALUE, *str);
+				cur->_next = tmp;
+				cur = cur->_next;
+				++str;
+			}
+			else if (*str == '(')
+			{
+				GeneralListNode* sub = new GeneralListNode(SUB);
+				cur->_next = sub;
+				cur = sub;
+				sub->_subLink = _CreateList(str);
+
+			}
+			else if (*str == ')')
+			{
+				++str;
+				return head;
+			}
+			else
+			{
+				++str;
+			}
+		}
+		return head;
+	}
+	void _Disp(GeneralListNode*& head)
+	{
+		GeneralListNode* cur = head;
+		while (cur)
+		{
+			if (cur->_type == HEAD)
+			{
+				cout << "(";
+			}
+			else if (cur->_type == VALUE)
+			{
+				cout << cur->_value;
+				if (cur->_next)
+				{
+					cout << ",";
+				}
+
+			}
+			else
+			{
+				_Disp(cur->_subLink);
+			}
+			cur = cur->_next;
+		}
+		cout << ")";
+	}
+
+	GeneralListNode* _Copy(GeneralListNode *& head)
+	{
+		GeneralListNode* cur = (GeneralListNode*)head;
+		GeneralListNode* newhead = new GeneralListNode(HEAD);
+		GeneralListNode* next = newhead;
+		cur = cur->_next;
+		while (cur)
+		{
+			if (cur->_type == VALUE)
+			{
+				GeneralListNode* tmp = new GeneralListNode(VALUE);
+				tmp->_value = cur->_value;
+				next->_next = tmp;
+				next = tmp;
+				cur = cur->_next;
+			}
+			else if (cur->_type == SUB)
+			{
+				GeneralListNode* tmp = new GeneralListNode(SUB);
+				next->_next = tmp;
+				next = tmp;
+				tmp->_subLink = _Copy(cur->_subLink);
+				cur = cur->_next;
+			}
+		}
+		return newhead;
+	}
+
+	int _Size(GeneralListNode *& head)
+	{
+		GeneralListNode* cur = (GeneralListNode*)head;
+		int size = 0;
+		
+		while (cur)
+		{
+			if (cur->_type == HEAD)
+			{
+				cur = cur->_next;
+			}
+			else if (cur->_type == VALUE)
+			{
+				++size;
+				cur = cur->_next;
+			}
+			else 
+			{
+				size = size + _Size(cur->_subLink);
+				cur = cur->_next;
+			}
+		}
+		return size; 
+	}
+	int _Depth(GeneralListNode *& head)
+	{
+		GeneralListNode* cur = (GeneralListNode*)head;
+		int depth = 1;
+		while (cur)
+		{
+			if (cur->_type == SUB)
+			{
+				int subDepth = _Depth(cur->_subLink);
+				if (depth < subDepth + 1)
+				{
+					depth = subDepth + 1;
+				}
+			}
+			cur = cur->_next;
+		}
+		return depth;
+	}
+
+private:
+	GeneralListNode* _head;
+};
+void test()
+{
+	Generalied g("(a,b,(c,d))");
+	//g.Disp();
+	//cout << endl;
+	Generalied f("(a,b,(c,d),(e,(f),h))");
+	//f.Disp();
+	//cout << endl;
+	//Generalied a = g;
+	////a.Disp();
+	//cout << endl;
+	////a=g = f;
+	//g.Disp();
+	//cout << endl;
+	//a.Disp();
+
+
+	//cout << "*****************" << endl;
+	//cout<<a.Size();
+	//cout << a.Depth()<<endl;
+	cout << f.Depth() << endl;
+}
+int main()
+{
+	test();
+	system("pause");
+	return 0;
+}

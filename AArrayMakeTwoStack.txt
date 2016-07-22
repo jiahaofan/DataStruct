@@ -1,0 +1,648 @@
+
+//方法1
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+template<class T>
+class TwoStack
+{
+public:
+	TwoStack(int size)
+		:_top1(-1), _top2(size), _len(size)
+	{							  
+		_arr = new T[size];
+	}
+	~TwoStack()
+	{
+		if (_arr)
+		{	
+			delete[] _arr;
+		}
+	}
+	void Push(int index, int data);
+	T Pop(int index);
+	bool IsEmpty(int index);
+	void Disp();
+	T Top(int index);
+private:
+	int _top1;
+	int _top2;
+	int _len;
+	T* _arr;
+};
+
+template<class T>
+void TwoStack<T>::Push(int index, int data)
+{
+	if (_top1 >= _top2 - 1)
+	{
+		cout << "Stack is overflow" << endl;
+		return; 
+	}
+	
+	if (index == 0)
+	{
+		_top1++;
+		_arr[_top1] = data;
+	}
+	else
+	{
+		_top2--;
+		_arr[_top2] = data;
+	}
+}
+template<class T>
+T TwoStack<T>::Pop(int index)
+{
+	int ret;
+	if (index == 0)
+	{
+		if (_top1 < 0)
+		{
+			cout<<"Stack1 is null"<<endl;
+			return -1;
+		}
+		else
+		{
+			ret = _arr[_top1];
+			_top1--;
+		}
+	}
+	else
+	{
+		if (_top2 > _len)
+		{
+			cout << "Stack2 is null" << endl;
+			return -1;
+		}
+		else
+		{
+			ret = _arr[_top2];
+			_top2++;
+		}
+	}
+	return ret;
+}								   
+template<class T>
+bool TwoStack<T>::IsEmpty(int index)
+{
+	if (index == 0 && _top1 < 0)
+		return true;
+	if (index == 1 && _top2 >= _len)
+		return true;
+	return false;
+}
+template<class T>
+void TwoStack<T>::Disp()
+{
+	{
+		for (int i = 0; i < _len; i++)
+		{
+			cout << _arr[i] << " ";
+		}
+	}
+}
+
+template<class T>
+T TwoStack<T>::Top(int index)
+{
+	if (0 == index && _top1>=0)
+	{
+		return _arr[_top1];
+	}
+
+	if (1 == index && _top2 < _len)
+	{
+		return _arr[_top2];
+	}
+
+	cout << "NO TOP" << endl;
+	exit(0);
+}
+void test1()
+{
+	TwoStack<int>s(10);
+	s.Push(0, 1);
+	s.Push(0, 2);
+	s.Push(0, 3);
+	s.Push(0, 4);
+	s.Push(0, 5);
+	//s.Push(0, 5);
+
+	s.Push(1, 6);
+	s.Push(1, 7);
+	s.Push(1, 8);
+	s.Push(1, 9);
+	s.Push(1, 10);
+	//s.Push(1, 10);
+	s.Disp();
+	//cout << s.IsEmpty(1);
+}
+
+void test2()
+{
+	TwoStack<int>s(10);
+	s.Push(0, 1);
+	s.Push(0, 2);
+	s.Push(0, 3);
+	s.Push(0, 4);
+	s.Push(0, 5);
+
+	s.Push(1, 6);
+	s.Push(1, 7);
+	s.Push(1, 8);
+	s.Push(1, 9);
+	s.Push(1, 10);
+	//cout<<s.Top(1);
+	
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	//cout<<s.IsEmpty(0);
+}
+
+int main()
+{
+	test1();
+	//test2();
+	system("pause");
+	return  0;
+}
+
+
+
+
+方法二：
+
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+template<class T>
+class TwoStack
+{
+public:
+	TwoStack(int size)
+		:_top1(-1), _top2(-1), _len(size)
+	{
+		_arr = new T[size];
+	}
+	~TwoStack()
+	{
+		if (_arr)
+		{
+			delete[] _arr;
+		}
+	}
+	void Push(int index, int data);
+	T Pop(int index);
+	bool IsEmpty(int index);
+	void Disp();
+	T Top(int index);
+private:
+	int _top1;
+	int _top2;
+	int _len;
+	T* _arr;
+};
+
+template<class T>
+void TwoStack<T>::Push(int index, int data)
+{
+	//if (_len % 2 == 0)
+	//{
+	//	if (_top1>_len-2 || _top2>=_len-1)
+	//	{
+	//		cout << "overflow" << endl;
+	//		return;
+	//	}
+	//}
+	
+	//else
+	//{
+	//	if (_top1 >_len || _top2 >= _len - 2)
+	//	{
+	//		cout << "overflow" << endl;
+	//		return;
+	//	}
+	//}
+
+	int flag = _len % 2;
+	if (index == 0)
+	{
+		if (flag == 0)						
+		{
+			if (_top1 >= _len - 2)
+			{
+					cout << "Stack1 overflow" << endl;
+					return;
+			}
+		}
+		if (flag == 1)
+		{
+			if (_top1 >= _len - 1)
+			{
+				cout << "overflow" << endl;
+				return;
+			}
+		}
+		////////////////////////////
+		if (_top1 == -1)
+		{
+			_top1 = 0;
+			_arr[_top1] = data;
+		}
+		else
+		{
+			_top1+=2;
+			_arr[_top1] = data;
+		}
+	}
+	/////////////////////////////////////////////////////////
+	else
+	{
+		if (flag == 0)
+		{
+			if (_top2 >= _len - 2)
+			{
+				cout << "Stack2 overflow" << endl;
+				return;
+			}
+		}
+		if (flag == 1)
+		{
+			if (_top2 >= _len - 1)
+			{
+				cout << "overflow" << endl;
+				return;
+			}
+		}
+		///////////////
+		if (_top2 == -1)
+		{
+			_top2 = 1;
+			_arr[_top2] = data;
+		}
+		else
+		{
+			_top2+=2;
+			_arr[_top2] = data;
+		}
+	
+	}
+}
+template<class T>
+T TwoStack<T>::Pop(int index)
+{
+	int ret;
+	if (index == 0)
+	{
+		if (_top1 < 0)
+		{
+			cout << "Stack1 is null" << endl;
+			return -1;
+		}
+		else
+		{
+			ret = _arr[_top1];
+			_top1-=2;
+		}
+	}
+	else
+	{
+		if (_top2 <1)
+		{
+			cout << "Stack2 is null" << endl;
+			return -1;
+		}
+		else
+		{
+			ret = _arr[_top2];
+			_top2-=2;
+		}
+	}
+	return ret;
+}
+template<class T>
+bool TwoStack<T>::IsEmpty(int index)
+{
+	if (index == 0 && _top1 < 0)
+		return true;
+	if (index == 1 && _top2 < 0)
+		return true;
+	return false;
+}
+template<class T>
+void TwoStack<T>::Disp()
+{
+	{
+		for (int i = 0; i < _len; i++)
+		{
+			cout << _arr[i] << " ";
+		}
+	}
+}
+
+template<class T>
+T TwoStack<T>::Top(int index)
+{
+	if (0 == index && _top1 >= 0)
+	{
+		return _arr[_top1];
+	}
+
+	if (1 == index && _top2 >=1)
+	{
+		return _arr[_top2];
+	}
+
+	cout << "NO TOP" << endl;
+	exit(0);
+}
+void test1()
+{
+	TwoStack<int>s(10);
+	s.Push(0, 1);
+	s.Push(0, 2);
+	s.Push(0, 3);
+	s.Push(0, 4);
+	s.Push(0, 5);
+	//s.Push(0, 5);
+	s.Push(1, 6);
+	s.Push(1, 7);
+	s.Push(1, 8);
+	s.Push(1, 9);
+	s.Push(1, 10);
+	//s.Push(1, 10);
+	//cout << s.Top(1);
+	//cout<<s.IsEmpty(0);
+	s.Disp();
+}
+
+void test2()
+{
+	TwoStack<int>s(10);
+	s.Push(0, 1);
+	s.Push(0, 2);
+	s.Push(0, 3);
+	s.Push(0, 4);
+	s.Push(0, 5);
+
+	s.Push(1, 6);
+	s.Push(1, 7);
+	s.Push(1, 8);
+	s.Push(1, 9);
+	s.Push(1, 10);
+
+
+	cout << s.Pop(0)<<" ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	//cout<<s.Top(1);
+
+}
+
+int main()
+{
+	test1();
+	test2();
+	system("pause");
+	return  0;
+}
+
+
+
+//方法三
+
+
+
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+template<class T>
+class TwoStack
+{
+public:
+	TwoStack()
+		:_top1(-1), _top2(-1), _len(0), _arr(NULL), _capacity(0)
+	{							  
+		
+	}
+	~TwoStack()
+	{
+		if (_arr)
+		{	
+			delete[] _arr;
+		}
+	}
+	void Push(int index, int data);
+	T Pop(int index);
+	bool IsEmpty(int index);
+	void Disp();
+	T Top(int index);
+
+	void IncreaseCapcity();
+private:
+	int _top1;
+	int _top2;
+	int _len;
+	T* _arr;
+	int _capacity;
+};
+
+template<class T>
+void TwoStack<T>::IncreaseCapcity()
+{
+	int top1 = _top1;
+	int top2 = _top2;
+	int size = _capacity;
+	_capacity = _len * 2 + 3;
+	int capacity = _len * 2 + 3;
+	int newlen = capacity;
+	T* tmp = new T[_capacity];
+	if (_arr != NULL)
+	{
+		for (int i = 0; i <= top1; i++)
+		{
+			tmp[i] = _arr[i];
+		}
+		for (int j = top1 + 1; j < size; j++)
+		{
+			tmp[--capacity] = _arr[--_len];
+			--newlen;
+		}
+	}
+
+
+	if (_arr != NULL)
+	{
+		delete[] _arr;
+	}
+	_arr = tmp;
+	_len = newlen;
+	_top2 = _len;
+
+}
+template<class T>
+void TwoStack<T>::Push(int index, int data)
+{
+	if (_top1 >= _top2 - 1)
+	{
+		IncreaseCapcity();
+	}
+	
+	if (index == 0)
+	{
+		_top1++;
+		_arr[_top1] = data;
+	}
+	else
+	{
+		_top2--;
+		_arr[_top2] = data;
+	}
+}
+template<class T>
+T TwoStack<T>::Pop(int index)
+{
+	int ret;
+	if (index == 0)
+	{
+		if (_top1 < 0)
+		{
+			cout<<"Stack1 is null"<<endl;
+			return -1;
+		}
+		else
+		{
+			ret = _arr[_top1];
+			_top1--;
+		}
+	}
+	else
+	{
+		if (_top2 > _len)
+		{
+			cout << "Stack2 is null" << endl;
+			return -1;
+		}
+		else
+		{
+			ret = _arr[_top2];
+			_top2++;
+		}
+	}
+	return ret;
+}								   
+template<class T>
+bool TwoStack<T>::IsEmpty(int index)
+{
+	if (index == 0 && _top1 < 0)
+		return true;
+	if (index == 1 && _top2 >= _len)
+		return true;
+	return false;
+}
+template<class T>
+void TwoStack<T>::Disp()
+{
+	{
+		for (int i = 0; i < _capacity; i++)
+		{
+			cout << _arr[i] << " ";
+		}
+	}
+}
+
+template<class T>
+T TwoStack<T>::Top(int index)
+{
+	if (0 == index && _top1>=0)
+	{
+		return _arr[_top1];
+	}
+
+	if (1 == index && _top2 < _len)
+	{
+		return _arr[_top2];
+	}
+
+	cout << "NO TOP" << endl;
+	exit(0);
+}
+void test1()
+{
+	TwoStack<int>s;
+	s.Push(0, 1);
+	s.Push(0, 2);
+	s.Push(0, 3);
+	s.Push(0, 4);
+	s.Push(0, 5);
+	//s.Push(0, 5);
+	//cout << s.Pop(0) << " ";
+	//cout << s.Pop(0) << " ";
+	//cout << s.Pop(0) << " ";
+	//cout << s.Pop(0) << " ";
+	//cout << s.Pop(0) << " ";
+	s.Push(1, 6);
+	s.Push(1, 7);
+	s.Push(1, 8);
+	s.Push(1, 9);
+	s.Push(1, 10);
+	//s.Push(1, 10);
+	s.Disp();
+	//cout << s.IsEmpty(1);
+}
+
+void test2()
+{
+	TwoStack<int>s;
+	s.Push(0, 1);
+	s.Push(0, 2);
+	s.Push(0, 3);
+	s.Push(0, 4);
+	s.Push(0, 5);
+
+	s.Push(1, 6);
+	s.Push(1, 7);
+	s.Push(1, 8);
+	s.Push(1, 9);
+	s.Push(1, 10);
+	//cout<<s.Top(1);
+	
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(0) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	cout << s.Pop(1) << " ";
+	//cout<<s.IsEmpty(0);
+}
+
+int main()
+{
+	test1();
+	//test2();
+	system("pause");
+	return  0;
+}
+
+
+

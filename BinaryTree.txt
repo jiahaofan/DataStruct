@@ -1,0 +1,191 @@
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+#include<queue>
+template<class T>
+struct BinaryTreeNode
+{
+	BinaryTreeNode* _left;
+	BinaryTreeNode* _right;
+	T _data;
+	BinaryTreeNode(const T x)
+		:_left(NULL), _right(NULL), _data(x)
+	{}
+};
+template<class T>
+class  BinaryTree
+{
+	typedef BinaryTreeNode<T> Node;
+public:
+	BinaryTree()
+		:_root(NULL)
+	{}
+	BinaryTree(T *a, size_t size, char invalid);
+	void PreOrder();
+	void InOrder();
+	void PostOrder();
+	void LevelOrder();	 //层次遍历
+	size_t Size();
+	size_t LeafSize();
+	size_t Depth();
+private:
+	Node* _root;
+protected:
+	Node* _CreateTree(const T *a, size_t &index,size_t size,char invalid)
+	{
+		Node* root = NULL;
+		if (index < size && a[index ]!= invalid)
+		{
+			root = new Node(a[index]);
+			root->_left = _CreateTree(a, ++index, size, invalid);
+			root->_right = _CreateTree(a, ++index, size, invalid);
+		}
+		return root;
+	}
+	void _PreOrder(Node* root)
+	{
+		if (root==NULL)
+		{
+			return;
+		}
+		cout << root->_data << " ";
+		_PreOrder(root->_left);
+		_PreOrder(root->_right);
+	}
+	void _InOrder(Node* root)
+	{
+		if (root == NULL)
+		{
+			return;
+		}
+		_InOrder(root->_left);
+		cout << root->_data << " ";
+		_InOrder(root->_right);
+	}
+	void _PostOrder(Node* root)
+	{
+		if (root == NULL)
+		{
+			return;
+		}
+		_PostOrder(root->_left);
+		_PostOrder(root->_right);
+		cout << root->_data << " ";
+	}
+	size_t _Size(Node * root)
+	{
+		if (root == NULL)
+		{
+			return 0;
+		}
+		return _Size(root->_left) + _Size(root->_right) + 1;
+	}
+	size_t _LeafSize(Node* root)
+	{
+		if (root == NULL)
+		{
+			return 0;
+		}
+		if (root->_left == NULL && root->_right == NULL)
+		{
+			return 1;
+		}
+		return _LeafSize(root->_left) + _LeafSize(root->_right);
+	}
+	size_t _Depth(Node* root)
+	{
+		if (root == NULL)
+		{
+			return 0;
+		}
+		int left = _Depth(root->_left)+1;
+		int right = _Depth(root->_right)+1;
+		return left > right ? left : right;
+	}
+};
+template<class T>
+size_t BinaryTree<T>::Depth()
+{
+	return _Depth(_root);
+}
+template<class T>
+size_t BinaryTree<T>::LeafSize()
+{
+	return _LeafSize(_root);
+}
+template<class T>
+size_t BinaryTree<T>::Size()
+{
+	return _Size(_root);
+}
+template<class T>
+void BinaryTree<T>::LevelOrder()
+{
+	if (_root == NULL)
+	{
+		return;
+	}
+	queue<Node*> s;
+	s.push(_root);
+	while (!s.empty())	//利用队列先进先出的原则，对于一个节点先压跟节点，
+		                 //出一个节点压这个节点的左右节点。
+	{
+		Node* front = s.front();
+		cout << front->_data << " ";
+		s.pop();
+		if (front->_left != NULL)
+		{	
+			s.push(front->_left);
+		}
+		if (front->_right != NULL)
+		{
+		    s.push(front->_right);
+		}
+		
+	}
+}
+template<class T>
+void BinaryTree<T>::PostOrder()
+{
+	_PostOrder(_root);
+}
+
+template<class T>
+void BinaryTree<T>::PreOrder()
+{
+	_PreOrder(_root);
+}
+template<class T>
+BinaryTree<T>::BinaryTree(T *a, size_t size,char invalid)
+{
+	size_t index = 0;
+	_root=_CreateTree(a, index,size,invalid);
+}
+template <class T>
+void BinaryTree<T>::InOrder()
+{
+	_InOrder(_root);
+}
+
+void test1()
+{
+    int array[10] = { 1, 2, 3, '#', '#', 4, '#', '#', 5, 6 };
+	BinaryTree<int> s(array, 10, '#');
+	s.PreOrder();
+	cout << endl;
+	s.InOrder();
+	cout << endl;
+	s.PostOrder();
+	cout << endl;
+	s.LevelOrder();
+	cout << endl;
+	cout<<s.Size();
+	cout << endl;
+	cout << s.Depth();
+}
+int main()
+{
+	test1();
+	system("pause");
+	return 0;
+}

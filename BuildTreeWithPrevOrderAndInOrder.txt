@@ -1,0 +1,131 @@
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+
+struct BinaryTreeNode
+{
+	int _value;
+	BinaryTreeNode* _left;
+	BinaryTreeNode* _right;
+	BinaryTreeNode(int value)
+		:_value(value),
+		_left(NULL),
+		_right(NULL)
+	{}
+};
+
+class BinaryTree
+{
+	typedef BinaryTreeNode Node;
+public:
+	BinaryTree()
+		:_root(NULL)
+	{}
+	void Construct(int *prevorder, int *inorder, int length)
+	{
+		if (prevorder == NULL || inorder == NULL || length <= 0)
+		{
+			return;
+		}
+		_root = _Construct(prevorder, prevorder + length - 1, inorder, inorder + length - 1);
+	}
+
+	void PrePrint()
+	{
+		_PrevPrint(_root);
+		cout << endl;
+	}
+
+	void InPrint()
+	{
+		_InPrint(_root);
+		cout << endl;
+	}
+protected:
+	Node* _Construct(int *startPrevorder, int *endPrevorder, int *startInorder, int *endInorder)
+	{
+		int rootValue = startPrevorder[0];
+		Node* root = new Node(rootValue);
+		if (startPrevorder == endPrevorder)
+		{
+			if (startInorder == endInorder)
+			{
+				return root;
+			}
+			else
+			{
+				throw exception("Invalid input");
+			}
+		}
+		/*
+		在中序遍历中找根节点
+		*/
+		int* rootInorder = startInorder;  
+		while (rootInorder <= endInorder && *rootInorder != rootValue)
+		{
+			++rootInorder;
+		}
+
+		/*没找到，抛个异常*/
+		if (*rootInorder != rootValue)
+		{
+			throw exception("Invalid input");
+		}
+
+		int leftLength = rootInorder - startInorder;
+		int *leftPrevOrderEnd = startPrevorder + leftLength;
+		if (leftLength > 0)
+		{//构建做子树
+			root->_left = _Construct(startPrevorder + 1, leftPrevOrderEnd, startInorder, rootInorder - 1);
+		}
+		if (leftLength < endPrevorder - startPrevorder)
+		{
+			//构建右子树
+			root->_right = _Construct(leftPrevOrderEnd + 1, endPrevorder, rootInorder + 1, endInorder);
+		}
+		return root;
+	}
+
+	void _InPrint(Node* root)
+	{
+		if (root == NULL)
+		{
+			return;
+		}
+		_PrevPrint(root->_left);
+		cout << root->_value << " ";
+		_PrevPrint(root->_right);
+
+	}
+	void _PrevPrint(Node* root)
+	{
+		if (root == NULL)
+		{
+			return;
+		}
+		cout << root->_value << " ";
+		_PrevPrint(root->_left);
+		_PrevPrint(root->_right);
+
+
+	}
+private:
+	Node* _root;
+};
+
+
+void test()
+{
+	int prev[] = { 1, 0, 4, 7, 3, 5, 6, 8 };
+	int in[] = { 4, 7, 2, 1, 5, 3, 8, 6 };
+	BinaryTree t;
+	t.Construct(prev, in, 8);
+	t.PrePrint();
+	t.InPrint();
+}
+int main()
+{
+	test();
+	system("pause");
+	return 0;
+}

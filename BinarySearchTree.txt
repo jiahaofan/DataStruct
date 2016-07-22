@@ -1,0 +1,400 @@
+#define  _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+template <class K,class V>
+struct BinarySearchTreeNode
+{
+	K _key;
+	V _value;
+	BinarySearchTreeNode<K, V>* _left;
+	BinarySearchTreeNode<K, V>* _right;
+	BinarySearchTreeNode(const K& key, const V& value)
+		:_key(key),
+		_value(value),
+		_left(NULL),
+		_right(NULL)
+	{}
+};
+template <class K, class V>
+class BinarySearchTree
+{
+	typedef BinarySearchTreeNode<K, V>Node;
+public:
+	BinarySearchTree()
+		:_root(NULL)
+	{}
+	bool Insert(const K& key, const V& value)
+	{
+		if (_root == NULL)
+		{
+			_root = new Node(key, value);
+			return true;
+		}
+		Node *cur = _root;
+		Node* prev = NULL;
+		while (cur)
+		{
+			if (cur->_key > key)
+			{
+				prev = cur;
+				cur = cur->_left;
+			}
+			else if (cur->_key < key)
+			{
+				prev = cur;
+				cur = cur->_right;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		if (prev->_key>key)
+		{
+			prev->_left = new Node(key, value);
+			return true;
+		}
+		else
+		{
+			prev->_right = new Node(key, value);
+			return true;
+		}
+		return false;
+
+	}
+
+	//递归实现插入
+	bool Insert_R(const K& key, const V& value)
+	{
+		return _Insert_R(_root, key, value);
+	}
+
+	//递归实现查找
+	Node* Find_R(const K& key)
+	{
+		return _Find_R(_root, key);
+	}
+
+	Node* Find(const K& key)
+	{
+		Node * cur = _root;
+		while (cur)
+		{
+			if (cur->_key == key)
+			{
+				return cur;
+			}
+			else if (cur->_key > key)
+			{
+				cur = cur->_left;
+			}
+			else
+			{
+				cur = cur->_right;
+			}
+		}
+		return false;
+	}
+	bool Romove(const K& key)
+	{
+		Node* cur = _root;
+		Node* prev = NULL;
+		while (cur)   //找key的位置
+		{
+			if (cur->_key > key)
+			{
+				prev = cur;
+				cur = cur->_left;
+			}
+			else if (cur->_key < key)
+			{
+				prev = cur;
+				cur = cur->_right;
+			}
+			else
+			{
+				break;
+			}
+		}
+		if (!cur->_left)  //左子树为空
+		{
+			if (prev == NULL)  //检查是不是_root
+			{
+				_root = cur->_right;
+				delete cur;
+				return true;
+			}
+			if (cur->_right) //右子树不为空
+			{
+				if (prev->_left == cur)  //prev的左边是cur
+				{
+					prev->_left = cur->_right;
+					delete cur;
+					return true;
+				}
+				else         //prev的右边是cur
+				{
+					prev->_right = cur->_right;
+					delete cur;
+					return true;
+				}
+				
+			}
+			else    //cur的左右子树都为空
+			{
+				if (prev->_left == cur)//检查是不是_root
+				{
+					delete cur;
+					prev->_left = NULL;
+				}
+				else
+				{
+					delete cur;
+					prev->_right = NULL;
+				}
+			}
+			
+			
+		}
+		else if (!cur->_right )   //右子树为空
+		{
+			if (prev == NULL)
+			{
+				_root = cur->_left;
+				delete cur;
+				return true;
+			}
+			if (cur->_left) //左子树不为空
+			{
+				if (prev->_left == cur)  //prev的左边是cur
+				{
+					prev->_left = cur->_left;
+					delete cur;
+					return true;
+				}
+				else         //prev的右边是cur
+				{
+					prev->_right = cur->_left;
+					delete cur;
+					return true;
+				}
+
+			}
+			else    //cur的左右子树都为空
+			{
+				if (prev->_left == cur)
+				{
+					delete cur;
+					prev->_left = NULL;
+				}
+				else
+				{
+					delete cur;
+					prev->_right = NULL;
+				}
+			}
+		}
+		else  //左右子树都不为空
+		{
+			prev = cur;
+			Node *del = cur->_left;
+			while (del->_right)
+			{
+				prev = del;
+				del = del->_right;
+				swap(cur->_key, del->_key);
+				swap(cur->_value, del->_value);
+			}
+			if (prev != cur)
+			{
+				prev->_right = del->_left;
+			}
+			else
+			{
+				prev->_left = del->_left;
+			}
+			delete del;
+		}
+		return true;
+	}
+	bool Remove_R(const K& key)
+	{
+		return _Remove_R(_root, key);
+	}
+	void Inorder()
+	{
+		_Inorder(_root);
+	}
+protected:
+	void _Inorder(Node*& root)
+	{
+		if (root == NULL)
+		{
+			return;
+		}
+		_Inorder(root->_left);
+		cout << root->_key << " " << root->_value << endl;
+		_Inorder(root->_right);
+	}
+	bool _Insert_R(Node*& root, const K& key, const V& value)
+	{
+		if (root==NULL)
+		{
+			root = new Node(key, value);
+			return true;
+		}
+		if (root->_key > key)
+		{
+			_Insert_R(root->_left, key, value);
+		}
+		else if (root->_key < key)
+		{
+			_Insert_R(root->_right, key, value);
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	Node* _Find_R(Node*& root, const K& key)
+	{
+		if (root == NULL)
+		{
+			return NULL;
+		}
+		if (root->_key == key)
+		{
+			return root;
+		}
+		else if (root->_key > key)
+		{
+			_Find_R(root->_left, key);
+		}
+		else
+			_Find_R(root->_right, key);
+	}
+
+	bool _Remove_R(Node*& root, const K& key)
+	{
+		if (root == NULL)
+		{
+			return false;
+		}
+		else
+		{
+			if (root->_key == key)
+			{
+				if (root->_left != NULL && root->_right != NULL)//左右子树都存在
+				{
+					Node* prev = root;
+					Node *del = root->_left;
+					while (del->_right)
+					{
+						prev = del;
+						del = del->_right;
+						swap(root->_key, del->_key);
+						swap(root->_value, del->_value);
+					}
+					_Remove_R(root, del->_key);
+				}
+				else//左右子树都不存在或者只有一个
+				{
+					Node*  del = root;
+					root = (root->_left != NULL) ? root->_left : root->_right;
+					delete del;
+					return true;
+				}
+			}
+			else if (root->_key > key)
+			{
+				_Remove_R(root->_left,key);
+			}
+			else
+			{
+				_Remove_R(root->_right,key);
+			}
+		}
+	}
+
+protected:
+	Node* _root;
+
+};
+
+
+void BinarySearchTreeTest()
+{
+	BinarySearchTree<int, int> t;
+	//t.Insert(7, 2);
+	//t.Insert(2, 2);
+	//t.Insert(7, 2);
+	//t.Insert(2, 2);
+	//t.Insert(3, 2);
+	//t.Insert(4, 2);
+	//t.Insert(1, 1);
+	//t.Insert(5, 2);
+	//t.Insert(10, 2);
+	//t.Insert(6, 2);
+	//t.Insert(8, 2);
+	//t.Insert(9, 2);
+	//t.Inorder();
+
+	//测试递归插入
+	t.Insert_R(7, 2);
+	t.Insert_R(2, 2);
+	t.Insert_R(7, 2);
+	t.Insert_R(2, 2);
+	t.Insert_R(3, 2);
+	t.Insert_R(4, 2);
+	t.Insert_R(1, 1);
+	t.Insert_R(5, 2);
+	t.Insert_R(0, 2);
+	t.Insert_R(6, 2);
+	t.Insert_R(8, 2);
+	t.Insert_R(9, 2);
+
+	
+	//t.Inorder();
+	//测试查找
+	//BinarySearchTreeNode<int, int>*ret = t.Find(5);
+	//cout << ret->_key << endl;
+
+	//测试递归查找
+	//BinarySearchTreeNode<int, int>*ret = t.Find_R(5);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(1);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(2);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(3);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(4);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(5);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(6);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(7);
+	//cout << ret->_key << endl;
+	//ret = t.Find_R(8);
+	//cout << ret->_key << endl;
+
+	//测试删除
+	t.Remove_R(0);
+	t.Remove_R(8);
+	t.Remove_R(1);
+	t.Remove_R(2);
+	t.Remove_R(9);
+	t.Remove_R(5);
+	t.Remove_R(3);
+	t.Remove_R(4);
+	t.Remove_R(7);
+	t.Remove_R(6);
+	t.Inorder();
+}
+int main()
+{
+	BinarySearchTreeTest();
+	system("pause");
+}
